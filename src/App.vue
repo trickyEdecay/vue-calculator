@@ -40,73 +40,97 @@ export default {
   components: {
     MyBtn
   },
+  computed:{
+    led(){
+      if(this.errorText!==""){
+        return this.errorText;
+      }
+      if(this.isNewRound){
+        return this.result;
+      }
+      if(this.isInputingNumTwo && !this.isInputingNumOne){
+        return parseFloat(this.numTwo);
+      }else{
+        return parseFloat(this.numOne);
+      }
+    },
+  },
   data(){
     return {
-      led:"",
-      numOne:0,
-      numTwo:0,
-      result:0,
+      
+      numOne:"0",
+      numTwo:"0",
+      result:"0",
       operator:"",
+      // 是否正在输入第二个数
       isInputingNumTwo:false,
+      // 是否正在输入第一个数字
+      isInputingNumOne:true,
+      // 是否是新的回合
       isNewRound:false,
-      // 是否拥有小数点
-      hasDecimalPoint:false,
+      // 错误文本
+      errorText:"",
     }
   },
   methods:{
+    // 点击按钮和小数点
     pressNumber(num){
-      // 处理小数点
-      if(num === "."){
-        if(this.hasDecimalPoint){
+      this.isNewRound = false;
+      if(!this.isInputingNumTwo){
+        if(num === "." && this.numOne.indexOf('.')>=0){
           return;
         }
-        this.led = this.led+ ".";
-        this.hasDecimalPoint = true;
+        this.numOne = this.numOne + num + "";
         return;
       }
-      // 处理数字
-      if(this.operator==="" || this.isInputingNumTwo){
-          if(this.isNewRound){
-            this.led = num+"";
-            this.isNewRound = false;
-            return;
-          }
-          this.led = this.led+num;
-          return;
+      this.isInputingNumOne = false;
+      if(num === "." && this.numTwo.indexOf('.')>=0){
+        return;
       }
-      this.led = num+"";
+      this.numTwo = this.numTwo + num + "";
+    },
+    // 清空
+    allclear(){
+      this.numOne = "0";
+      this.numTwo = "0";
+      this.result = "0";
+      this.isInputingNumTwo = false;
+      this.isNewRound = true;
+      this.isInputingNumOne = true;
+      this.errorText = "";
+    },
+    // 点击操作符
+    pressOperator(ope){
+      this.operator = ope;
       this.isInputingNumTwo = true;
     },
-    allclear(){
-      this.led = "";
-    },
-    pressOperator(ope){
-      this.numOne = parseFloat(this.led);
-      this.operator = ope;
-      this.hasDecimalPoint = false;
-    },
+    // 点击等于号
     equalHandler(){
-      this.numTwo = parseFloat(this.led);
+      this.numOne = parseFloat(this.numOne);
+      this.numTwo = parseFloat(this.numTwo);
       switch(this.operator){
         case "+":
-          this.led = parseFloat((this.numOne+this.numTwo).toPrecision(12))+"";
+          this.result = parseFloat((this.numOne+this.numTwo).toPrecision(12))+"";
           break;
         case "-":
-          this.led = parseFloat((this.numOne-this.numTwo).toPrecision(12))+"";
+          this.result = parseFloat((this.numOne-this.numTwo).toPrecision(12))+"";
           break;
         case "*":
-          this.led = parseFloat((this.numOne*this.numTwo).toPrecision(12))+"";
+          this.result = parseFloat((this.numOne*this.numTwo).toPrecision(12))+"";
           break;
         case "/":
-          this.led = parseFloat((this.numOne/this.numTwo).toPrecision(12))+"";
+          if(this.numTwo===0){
+            this.errorText = "除数不能为0";
+          }
+          this.result = parseFloat((this.numOne/this.numTwo).toPrecision(12))+"";
           break;
       }
       this.operator = "";
       this.numOne = 0;
       this.numTwo = 0;
       this.isNewRound = true;
+      this.isInputingNumOne = true;
       this.isInputingNumTwo = false;
-      this.hasDecimalPoint = false;
     }
   }
 }
