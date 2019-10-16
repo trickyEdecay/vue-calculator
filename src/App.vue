@@ -75,6 +75,9 @@ export default {
   methods:{
     // 点击按钮和小数点
     pressNumber(num){
+      if(this.isNewRound){
+        this.numOne = "0";
+      }
       this.isNewRound = false;
       if(!this.isInputingNumTwo){
         if(num === "." && this.numOne.indexOf('.')>=0){
@@ -103,6 +106,7 @@ export default {
     pressOperator(ope){
       this.operator = ope;
       this.isInputingNumTwo = true;
+      this.numTwo = "0";
     },
     // 点击等于号
     equalHandler(){
@@ -125,9 +129,7 @@ export default {
           this.result = parseFloat((this.numOne/this.numTwo).toPrecision(12))+"";
           break;
       }
-      this.operator = "";
-      this.numOne = 0;
-      this.numTwo = 0;
+      this.numOne = this.result;
       this.isNewRound = true;
       this.isInputingNumOne = true;
       this.isInputingNumTwo = false;
